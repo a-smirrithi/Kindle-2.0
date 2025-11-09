@@ -27,10 +27,23 @@ public class LibraryController {
     @GetMapping("/dashboard/health")
     public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Backend is running");
-        response.put("timestamp", System.currentTimeMillis());
-        return ResponseEntity.ok(response);
+        try {
+            // Test database connection
+            long bookCount = bookRepository.count();
+            response.put("success", true);
+            response.put("message", "Backend and database are running");
+            response.put("database", "connected");
+            response.put("bookCount", bookCount);
+            response.put("timestamp", System.currentTimeMillis());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Backend running but database connection failed");
+            response.put("database", "disconnected");
+            response.put("error", e.getMessage());
+            response.put("timestamp", System.currentTimeMillis());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+        }
     }
 
     // Dashboard Stats
