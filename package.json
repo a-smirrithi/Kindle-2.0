@@ -1,0 +1,17 @@
+{
+  "name": "kindle-2-library",
+  "version": "2.0.0",
+  "description": "Kindle 2.0 Library Management System - A minimalist library management solution",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build process needed for static deployment'"
+  },
+  "keywords": ["library", "management", "books", "kindle"],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kindle 2.0 - Digital Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        .active { background-color: hsl(var(--p)); color: hsl(var(--pc)); }
+        .alert { position: fixed; top: 1rem; right: 1rem; z-index: 50; max-width: 24rem; }
+    </style>
+</head>
+<body class="min-h-screen bg-base-200">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center">
+        <div class="card bg-base-100 shadow-xl w-96">
+            <div class="card-body">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-2xl font-bold text-white">K2</span>
+                    </div>
+                    <h2 class="text-2xl font-bold">Kindle 2.0</h2>
+                    <p class="text-base-content/70">Digital Library System</p>
+                </div>
+                
+                <!-- Login/Signup Tabs -->
+                <div class="tabs tabs-boxed mb-4">
+                    <a class="tab tab-active" id="loginTab" onclick="showLoginForm()">Login</a>
+                    <a class="tab" id="signupTab" onclick="showSignupForm()">Sign Up</a>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="loginForm">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Username</span></label>
+                        <input type="text" value="admin" class="input input-bordered" id="username" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Password</span></label>
+                        <input type="password" value="admin123" class="input input-bordered" id="password" />
+                    </div>
+                    <div class="form-control mt-6">
+                        <button class="btn btn-primary" onclick="login()">Login</button>
+                    </div>
+                    <div class="text-center mt-4">
+                        <p class="text-xs text-base-content/50">Demo: admin / admin123</p>
+                    </div>
+                </div>
+                
+                <!-- Signup Form -->
+                <div id="signupForm" class="hidden">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Full Name</span></label>
+                        <input type="text" class="input input-bordered" id="signupName" placeholder="Enter your full name" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Email</span></label>
+                        <input type="email" class="input input-bordered" id="signupEmail" placeholder="Enter your email" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Username</span></label>
+                        <input type="text" class="input input-bordered" id="signupUsername" placeholder="Choose a username" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Password</span></label>
+                        <input type="password" class="input input-bordered" id="signupPassword" placeholder="Create a password" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Confirm Password</span></label>
+                        <input type="password" class="input input-bordered" id="signupConfirmPassword" placeholder="Confirm your password" />
+                    </div>
+                    <div class="form-control mt-6">
+                        <button class="btn btn-primary" onclick="signup()">Create Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <div class="drawer lg:drawer-open">
+            <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
+            
+            <!-- Main Content -->
+            <div class="drawer-content flex flex-col">
+                <!-- Top Bar -->
+                <div class="navbar bg-primary text-primary-content lg:hidden">
+                    <label for="drawer-toggle" class="btn btn-square btn-ghost drawer-button">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </label>
+                    <div class="flex-1">
+                        <span class="text-xl font-bold">Kindle 2.0</span>
+                    </div>
+                    <button class="btn btn-ghost" onclick="logout()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+
+                <!-- Content Area -->
+                <div class="flex-1 p-6">
+                    <!-- Dashboard -->
+                    <div id="dashboard" class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h1 class="text-3xl font-bold">Dashboard</h1>
+                            <div id="currentDate" class="text-base-content/70"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="stats shadow">
+                                <div class="stat">
+                                    <div class="stat-title">Total Books</div>
+                                    <div class="stat-value text-primary" id="totalBooks">0</div>
+                                </div>
+                            </div>
+                            <div class="stats shadow">
+                                <div class="stat">
+                                    <div class="stat-title">Total Users</div>
+                                    <div class="stat-value text-secondary" id="totalUsers">0</div>
+                                </div>
+                            </div>
+                            <div class="stats shadow">
+                                <div class="stat">
+                                    <div class="stat-title">Books Borrowed</div>
+                                    <div class="stat-value text-accent" id="borrowedCount">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-base-100 shadow-xl">
+                            <div class="card-body">
+                                <h3 class="card-title">Recent Activity</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="table">
+                                        <thead>
+                                            <tr><th>Book</th><th>User</th><th>Action</th><th>Date</th></tr>
+                                        </thead>
+                                        <tbody id="activityTable">
+                                            <tr><td colspan="4" class="text-center py-8 text-base-content/60">No activity yet</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-base-100 shadow-xl">
+                            <div class="card-body">
+                                <h3 class="card-title">Most Borrowed Books</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="table">
+                                        <thead>
+                                            <tr><th>Book</th><th>Author</th><th>Times Borrowed</th><th>Available</th></tr>
+                                        </thead>
+                                        <tbody id="mostBorrowedTable">
+                                            <tr><td colspan="4" class="text-center py-8 text-base-content/60">No borrowing data yet</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-base-100 shadow-xl">
+                            <div class="card-body">
+                                <h3 class="card-title text-warning">📅 Books Due Today</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="table">
+                                        <thead>
+                                            <tr><th>Book</th><th>User</th><th>Due Time</th><th>Status</th></tr>
+                                        </thead>
+                                        <tbody id="dueTodayTable">
+                                            <tr><td colspan="4" class="text-center py-8 text-base-content/60">No books due today</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Books -->
+                    <div id="books" class="hidden space-y-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h1 class="text-3xl font-bold">Books</h1>
+                                <p class="text-base-content/60">
+                                    <span id="totalBooksCount">0</span> total books • 
+                                    <span id="availableBooksCount">0</span> available • 
+                                    <span id="borrowedBooksCount">0</span> borrowed
+                                </p>
+                            </div>
+                            <button class="btn btn-primary" onclick="showAddBook()">Add Book</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="booksGrid"></div>
+                    </div>
+
+                    <!-- Users -->
+                    <div id="users" class="hidden space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h1 class="text-3xl font-bold">Users</h1>
+                            <button class="btn btn-primary" onclick="showAddUser()">Add User</button>
+                        </div>
+                        <div class="card bg-base-100 shadow-xl">
+                            <div class="card-body">
+                                <div class="overflow-x-auto">
+                                    <table class="table">
+                                        <thead>
+                                            <tr><th>Name</th><th>Email</th><th>Books Borrowed</th><th>Actions</th></tr>
+                                        </thead>
+                                        <tbody id="usersTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrow -->
+                    <div id="borrow" class="hidden space-y-6">
+                        <h1 class="text-3xl font-bold">Borrow Book</h1>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="card bg-base-100 shadow-xl">
+                                <div class="card-body">
+                                    <h3 class="card-title">Borrow a Book</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="form-control">
+                                            <label class="label"><span class="label-text">User</span></label>
+                                            <select class="select select-bordered" id="borrowUser">
+                                                <option disabled selected>Choose user</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-control">
+                                            <label class="label"><span class="label-text">Book</span></label>
+                                            <select class="select select-bordered" id="borrowBook">
+                                                <option disabled selected>Choose book</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-control">
+                                            <label class="label"><span class="label-text">Borrow Date</span></label>
+                                            <input type="date" class="input input-bordered" id="borrowDate" />
+                                        </div>
+                                        <div class="form-control">
+                                            <label class="label"><span class="label-text">Borrow Time (IST)</span></label>
+                                            <input type="time" class="input input-bordered" id="borrowTime" />
+                                        </div>
+                                        <div class="form-control">
+                                            <label class="label"><span class="label-text">Due Date</span></label>
+                                            <input type="date" class="input input-bordered" id="dueDate" />
+                                        </div>
+                                        <div class="form-control">
+                                            <label class="label"><span class="label-text">Due Time (IST)</span></label>
+                                            <input type="time" class="input input-bordered" id="dueTime" />
+                                        </div>
+                                    </div>
+                                    <div class="card-actions justify-end mt-4">
+                                        <button class="btn btn-primary" onclick="borrowBook()">Borrow Book</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card bg-base-100 shadow-xl">
+                                <div class="card-body">
+                                    <h3 class="card-title">Currently Borrowed</h3>
+                                    <div class="overflow-x-auto">
+                                        <table class="table">
+                                            <thead>
+                                                <tr><th>Book</th><th>User</th><th>Borrowed</th><th>Due</th><th>Actions</th></tr>
+                                            </thead>
+                                            <tbody id="borrowedTable"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Return -->
+                    <div id="return" class="hidden space-y-6">
+                        <h1 class="text-3xl font-bold">Return Books</h1>
+                        <div class="card bg-base-100 shadow-xl max-w-2xl">
+                            <div class="card-body">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="form-control md:col-span-2">
+                                        <label class="label"><span class="label-text">Select Book to Return</span></label>
+                                        <select class="select select-bordered" id="returnBookId">
+                                            <option disabled selected>Choose borrowed book</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-control">
+                                        <label class="label"><span class="label-text">Return Date</span></label>
+                                        <input type="date" class="input input-bordered" id="returnDate" />
+                                    </div>
+                                    <div class="form-control">
+                                        <label class="label"><span class="label-text">Return Time (IST)</span></label>
+                                        <input type="time" class="input input-bordered" id="returnTime" />
+                                    </div>
+                                </div>
+                                <div class="alert alert-info mt-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span>Current IST Time: <strong id="currentISTTime"></strong></span>
+                                </div>
+                                <div class="card-actions justify-end mt-4">
+                                    <button class="btn btn-primary" onclick="returnBook()">Return Book</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="drawer-side">
+                <label for="drawer-toggle" class="drawer-overlay"></label>
+                <aside class="w-64 min-h-full bg-base-100">
+                    <div class="p-4">
+                        <div class="flex items-center space-x-2 mb-8">
+                            <div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+                                <span class="text-white font-bold">K2</span>
+                            </div>
+                            <span class="text-xl font-bold">Kindle 2.0</span>
+                        </div>
+                        <ul class="menu space-y-2">
+                            <li><a id="nav-dashboard" onclick="showSection('dashboard')" class="active">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 5 4-4 4 4"></path>
+                                </svg>
+                                Dashboard
+                            </a></li>
+                            <li><a id="nav-books" onclick="showSection('books')">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253z"></path>
+                                </svg>
+                                Books
+                            </a></li>
+                            <li><a id="nav-users" onclick="showSection('users')">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+                                </svg>
+                                Users
+                            </a></li>
+                            <li><a id="nav-borrow" onclick="showSection('borrow')">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Borrow Books
+                            </a></li>
+                            <li><a id="nav-return" onclick="showSection('return')">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                                Return Books
+                            </a></li>
+                        </ul>
+                        <div class="divider"></div>
+                        <div class="hidden lg:block">
+                            <button class="btn btn-outline w-full" onclick="logout()">Logout</button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Book Modal -->
+    <dialog id="addBookModal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Add New Book</h3>
+            <div class="py-4 space-y-4">
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Title</span></label>
+                    <input type="text" class="input input-bordered" id="bookTitle" />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Author</span></label>
+                    <input type="text" class="input input-bordered" id="bookAuthor" />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">ISBN</span></label>
+                    <input type="text" class="input input-bordered" id="bookISBN" />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Genre</span></label>
+                    <input type="text" class="input input-bordered" id="bookGenre" />
+                </div>
+            </div>
+            <div class="modal-action">
+                <button class="btn" onclick="closeModal('addBookModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addBook()">Add Book</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Add User Modal -->
+    <dialog id="addUserModal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Add New User</h3>
+            <div class="py-4 space-y-4">
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Name</span></label>
+                    <input type="text" class="input input-bordered" id="userName" />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Username</span></label>
+                    <input type="text" class="input input-bordered" id="userUsername" placeholder="Unique username" />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Email</span></label>
+                    <input type="email" class="input input-bordered" id="userEmail" />
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Phone</span></label>
+                    <input type="tel" class="input input-bordered" id="userPhone" />
+                </div>
+            </div>
+            <div class="modal-action">
+                <button class="btn" onclick="closeModal('addUserModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addUser()">Add User</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:8080/api';
+        
+        // Global variables
+        let books = [];
+        let users = [];
+        let borrowed = [];
+        let currentUser = null;
+        
+        // IST Timezone utilities
+        const IST_OFFSET = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+        
+        function getISTTime() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            return new Date(utc + IST_OFFSET);
+        }
+        
+        function formatISTDateTime(date = null) {
+            const istTime = date ? new Date(date) : getISTTime();
+            return istTime.toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+        }
+        
+        function formatISTDate(date = null) {
+            const istTime = date ? new Date(date) : getISTTime();
+            return istTime.toLocaleDateString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+        
+        function formatISTTime(date = null) {
+            const istTime = date ? new Date(date) : getISTTime();
+            return istTime.toLocaleTimeString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+        }
+        
+        function getISTDateTimeString() {
+            const istTime = getISTTime();
+            return istTime.toISOString().slice(0, 16); // Format for datetime-local input
+        }
+        
+        function getISTDateString() {
+            const istTime = getISTTime();
+            const year = istTime.getFullYear();
+            const month = String(istTime.getMonth() + 1).padStart(2, '0');
+            const day = String(istTime.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Clear localStorage on startup for fresh start
+        function clearAllData() {
+            localStorage.removeItem('library_books');
+            localStorage.removeItem('library_users');
+            localStorage.removeItem('library_borrowed');
+            books = [];
+            users = [];
+            borrowed = [];
+            console.log('✅ All local data cleared for fresh start');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            clearAllData(); // Start completely fresh
+            startTimeUpdater();
+            initializeDateFields();
+            
+            // Try to connect to backend
+            checkBackendConnection();
+        });
+
+        // Login/Signup Form Functions
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('loginTab').classList.add('tab-active');
+            document.getElementById('signupTab').classList.remove('tab-active');
+        }
+
+        function showSignupForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.remove('hidden');
+            document.getElementById('loginTab').classList.remove('tab-active');
+            document.getElementById('signupTab').classList.add('tab-active');
+        }
+
+        // Signup function
+        async function signup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const username = document.getElementById('signupUsername').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            const confirmPassword = document.getElementById('signupConfirmPassword').value.trim();
+            
+            if (!name || !email || !username || !password || !confirmPassword) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Check if username already exists in localStorage
+            const existingUsers = JSON.parse(localStorage.getItem('kindle_auth_users')) || [];
+            if (existingUsers.some(user => user.username === username)) {
+                showNotification('Username already exists', 'error');
+                return;
+            }
+            
+            // Create new user account
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                username,
+                password: btoa(password), // Simple encoding (in production, use proper hashing)
+                createdAt: new Date().toISOString()
+            };
+            
+            existingUsers.push(newUser);
+            localStorage.setItem('kindle_auth_users', JSON.stringify(existingUsers));
+            
+            showNotification('Account created successfully! You can now login.', 'success');
+            
+            // Clear form and switch to login
+            clearForm(['signupName', 'signupEmail', 'signupUsername', 'signupPassword', 'signupConfirmPassword']);
+            showLoginForm();
+            
+            // Pre-fill login form
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = '';
+        }
+
+        // Local Storage - User-specific data
+        function saveToStorage() {
+            const currentUser = document.getElementById('currentUser')?.textContent || 'default';
+            const userKey = `kindle_${currentUser}`;
+            localStorage.setItem(`${userKey}_books`, JSON.stringify(books));
+            localStorage.setItem(`${userKey}_users`, JSON.stringify(users));
+            localStorage.setItem(`${userKey}_borrowed`, JSON.stringify(borrowed));
+        }
+
+        function loadFromStorage() {
+            const currentUser = document.getElementById('currentUser')?.textContent || 'default';
+            const userKey = `kindle_${currentUser}`;
+            books = JSON.parse(localStorage.getItem(`${userKey}_books`)) || [];
+            users = JSON.parse(localStorage.getItem(`${userKey}_users`)) || [];
+            borrowed = JSON.parse(localStorage.getItem(`${userKey}_borrowed`)) || [];
+        }
+
+        // API Helper functions
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const config = {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (data) config.body = JSON.stringify(data);
+                
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                
+                // Check if it's a network error (backend not running)
+                if (error.message.includes('fetch') || error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+                    throw new Error('BACKEND_OFFLINE');
+                }
+                throw error;
+            }
+        }
+
+        // Check backend connection with better error handling
+        async function checkBackendConnection() {
+            try {
+                await apiCall('/dashboard/health');
+                showNotification('✅ Connected to backend successfully!', 'success');
+                return true;
+            } catch (error) {
+                if (error.message === 'BACKEND_OFFLINE') {
+                    showNotification('⚠️ Backend offline - using local storage mode', 'warning');
+                } else {
+                    showNotification('❌ Backend connection failed', 'error');
+                }
+                return false;
+            }
+        }
+
+        // Load data from backend with fallback
+        async function loadFromAPI() {
+            try {
+                const [booksResponse, usersResponse, borrowsResponse] = await Promise.all([
+                    apiCall('/books'),
+                    apiCall('/users'),
+                    apiCall('/borrows/active')
+                ]);
+                
+                books = booksResponse.data || [];
+                users = usersResponse.data || [];
+                borrowed = borrowsResponse.data || [];
+                
+                saveToStorage();
+                showNotification('📊 Data loaded from database!', 'success');
+                return true;
+            } catch (error) {
+                console.error('Error loading data from API:', error);
+                if (error.message === 'BACKEND_OFFLINE') {
+                    showNotification('📱 Using local data - start backend for database sync', 'info');
+                }
+                return false;
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} shadow-lg`;
+            notification.innerHTML = `<span>${message}</span><button class="btn btn-sm btn-ghost" onclick="this.parentElement.remove()">×</button>`;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
+
+        // Login System
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showNotification('Please enter both username and password', 'error');
+                return;
+            }
+            
+            let loginSuccess = false;
+            let userRole = 'user';
+            
+            // Check admin credentials
+            if (username === 'admin' && password === 'admin123') {
+                loginSuccess = true;
+                userRole = 'admin';
+                currentUser = { username: 'admin', role: 'admin', name: 'Administrator' };
+            } else {
+                // Check user accounts
+                const existingUsers = JSON.parse(localStorage.getItem('kindle_auth_users')) || [];
+                const user = existingUsers.find(u => u.username === username && atob(u.password) === password);
+                
+                if (user) {
+                    loginSuccess = true;
+                    userRole = 'user';
+                    currentUser = { 
+                        username: user.username, 
+                        role: 'user', 
+                        name: user.name,
+                        email: user.email,
+                        id: user.id
+                    };
+                }
+            }
+            
+            if (loginSuccess) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                showSection('dashboard');
+                showNotification(`Welcome ${currentUser.name}!`, 'success');
+                
+                // Load user-specific data from localStorage
+                loadFromStorage();
+                
+                // Try to load data from backend
+                try {
+                    const backendConnected = await checkBackendConnection();
+                    if (backendConnected) {
+                        await loadFromAPI();
+                        updateDashboard();
+                    } else {
+                        updateDashboard();
+                    }
+                } catch (error) {
+                    console.log('Backend connection failed, using local data');
+                    updateDashboard();
+                }
+            } else {
+                showNotification('Invalid username or password', 'error');
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear current user data
+                books = [];
+                users = [];
+                borrowed = [];
+                currentUser = null;
+                
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+                showNotification('Logged out successfully', 'info');
+            }
+        }
+
+        // Load data from backend
+        async function loadFromAPI() {
+            const [booksResponse, usersResponse, borrowsResponse] = await Promise.all([
+                apiCall('/books'),
+                apiCall('/users'),
+                apiCall('/borrows/active')
+            ]);
+            
+            books = booksResponse.data || [];
+            users = usersResponse.data || [];
+            borrowed = borrowsResponse.data || [];
+            saveToStorage();
+        }
+
+        // Navigation
+        function showSection(section) {
+            ['dashboard', 'books', 'users', 'borrow', 'return'].forEach(s => {
+                const element = document.getElementById(s);
+                const navElement = document.getElementById(`nav-${s}`);
+                if (element) element.classList.add('hidden');
+                if (navElement) navElement.classList.remove('active');
+            });
+            
+            const sectionElement = document.getElementById(section);
+            const navElement = document.getElementById(`nav-${section}`);
+            if (sectionElement) sectionElement.classList.remove('hidden');
+            if (navElement) navElement.classList.add('active');
+            
+            // Load section data
+            if (section === 'books') loadBooks();
+            if (section === 'users') loadUsers();
+            if (section === 'borrow') loadBorrowOptions();
+            if (section === 'return') loadReturnOptions();
+            if (section === 'dashboard') updateDashboard();
+        }
+
+        // Date functions
+        function setCurrentDate() {
+            const istTime = getISTTime();
+            const dateString = istTime.toLocaleDateString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const timeString = formatISTTime();
+            
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                dateElement.innerHTML = `${dateString}<br><small class="text-sm opacity-70">${timeString} IST</small>`;
+            }
+        }
+
+        function initializeDateFields() {
+            const today = getISTDateString();
+            const borrowDateEl = document.getElementById('borrowDate');
+            const borrowTimeEl = document.getElementById('borrowTime');
+            const dueDateEl = document.getElementById('dueDate');
+            const dueTimeEl = document.getElementById('dueTime');
+            const returnDateEl = document.getElementById('returnDate');
+            const returnTimeEl = document.getElementById('returnTime');
+            
+            if (borrowDateEl) borrowDateEl.value = today;
+            if (borrowTimeEl) borrowTimeEl.value = getISTTime().toTimeString().slice(0, 5);
+            
+            if (dueDateEl) {
+                const dueDate = new Date(getISTTime());
+                dueDate.setDate(dueDate.getDate() + 14);
+                dueDateEl.value = dueDate.toISOString().slice(0, 10);
+            }
+            if (dueTimeEl) dueTimeEl.value = "23:59";
+            
+            if (returnDateEl) returnDateEl.value = today;
+            if (returnTimeEl) returnTimeEl.value = getISTTime().toTimeString().slice(0, 5);
+        }
+
+        // Update time every second
+        function startTimeUpdater() {
+            function updateTime() {
+                setCurrentDate();
+                
+                // Update current IST time in return section
+                const currentISTTimeEl = document.getElementById('currentISTTime');
+                if (currentISTTimeEl) {
+                    currentISTTimeEl.textContent = formatISTDateTime();
+                }
+            }
+            
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        // Dashboard
+        async function updateDashboard() {
+            try {
+                const statsResponse = await apiCall('/dashboard/stats');
+                const stats = statsResponse.data;
+                
+                document.getElementById('totalBooks').textContent = stats.totalBooks || books.length;
+                document.getElementById('totalUsers').textContent = stats.totalUsers || users.length;
+                document.getElementById('borrowedCount').textContent = stats.activeBorrows || borrowed.filter(b => !b.returnDate).length;
+                
+                // Update recent activity
+                updateRecentActivity(stats.recentActivity);
+                
+                // Update most borrowed books
+                await updateMostBorrowedBooks();
+                
+                // Update books due today
+                updateBooksDueToday();
+            } catch (error) {
+                document.getElementById('totalBooks').textContent = books.length;
+                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('borrowedCount').textContent = borrowed.filter(b => !b.returnDate).length;
+                
+                // Show local activity
+                updateRecentActivity();
+                
+                // Show local most borrowed
+                updateMostBorrowedBooksLocal();
+                
+                // Show local books due today
+                updateBooksDueToday();
+            }
+        }
+
+        function updateRecentActivity(apiActivity = null) {
+            const table = document.getElementById('activityTable');
+            let activities = [];
+            
+            if (apiActivity && apiActivity.length > 0) {
+                // Use API data
+                activities = apiActivity.slice(0, 10);
+            } else {
+                // Use local data
+                const recentBorrows = borrowed
+                    .sort((a, b) => new Date(b.borrowDate) - new Date(a.borrowDate))
+                    .slice(0, 10);
+                    
+                activities = recentBorrows.map(borrow => {
+                    // Use bookName and username directly from backend data
+                    return {
+                        book: { title: borrow.bookName || 'Unknown Book' },
+                        user: { name: borrow.username || 'Unknown User' },
+                        borrowDate: borrow.borrowDate,
+                        borrowTime: borrow.borrowTime,
+                        borrowDateTime: borrow.borrowDateTime,
+                        returnDate: borrow.returnDate,
+                        returnTime: borrow.returnTime,
+                        returnDateTime: borrow.returnDateTime,
+                        action: borrow.returnDate || borrow.returnDateTime ? 'Returned' : 'Borrowed'
+                    };
+                });
+            }
+            
+            if (activities.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-base-content/60">No recent activity</td></tr>';
+                return;
+            }
+            
+            table.innerHTML = activities.map(activity => {
+                // Handle both new API format (bookName, username) and old local format (book, user objects)
+                const bookTitle = activity.bookName || (activity.book && activity.book.title) || 'Unknown Book';
+                const userName = activity.username || (activity.user && activity.user.name) || 'Unknown User';
+                const action = activity.returnDate ? 'Returned' : 'Borrowed';
+                
+                // Handle both new and old date formats
+                let activityDateTime;
+                if (activity.returnDate) {
+                    activityDateTime = activity.returnDateTime ? new Date(activity.returnDateTime) : 
+                                     new Date(`${activity.returnDate}T${activity.returnTime || '12:00'}:00`);
+                } else {
+                    activityDateTime = activity.borrowDateTime ? new Date(activity.borrowDateTime) : 
+                                     new Date(`${activity.borrowDate}T${activity.borrowTime || '09:00'}:00`);
+                }
+                
+                const badgeClass = activity.returnDate ? 'badge-success' : 'badge-warning';
+                
+                return `
+                    <tr>
+                        <td>${bookTitle}</td>
+                        <td>${userName}</td>
+                        <td><span class="badge ${badgeClass}">${action}</span></td>
+                        <td>
+                            <div>${formatISTDate(activityDateTime)}</div>
+                            <div class="text-xs text-gray-600">${formatISTTime(activityDateTime)}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Most Borrowed Books Functions
+        async function updateMostBorrowedBooks() {
+            try {
+                const response = await apiCall('/dashboard/most-borrowed');
+                const mostBorrowed = response.data;
+                
+                const table = document.getElementById('mostBorrowedTable');
+                
+                if (mostBorrowed.length === 0) {
+                    table.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-base-content/60">No borrowing data yet</td></tr>';
+                    return;
+                }
+                
+                table.innerHTML = mostBorrowed.map(item => {
+                    const book = item.book;
+                    const borrowCount = item.borrowCount;
+                    const availableText = book.available ? 'Yes' : 'No';
+                    const availableClass = book.available ? 'text-green-600' : 'text-red-600';
+                    
+                    return `
+                        <tr>
+                            <td class="font-semibold">${book.title}</td>
+                            <td>${book.author}</td>
+                            <td><span class="badge badge-primary">${borrowCount}</span></td>
+                            <td><span class="${availableClass}">${availableText}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.log('Error loading most borrowed books from API, using local data');
+                updateMostBorrowedBooksLocal();
+            }
+        }
+
+        function updateMostBorrowedBooksLocal() {
+            const table = document.getElementById('mostBorrowedTable');
+            
+            // Count borrows for each book from local data using bookName
+            const borrowCounts = {};
+            borrowed.forEach(borrow => {
+                const bookName = borrow.bookName || 'Unknown Book';
+                borrowCounts[bookName] = (borrowCounts[bookName] || 0) + 1;
+            });
+            
+            // Sort books by borrow count
+            const sortedBooks = Object.entries(borrowCounts)
+                .map(([bookName, count]) => {
+                    return { bookName, borrowCount: count };
+                })
+                .sort((a, b) => b.borrowCount - a.borrowCount)
+                .slice(0, 10); // Top 10 most borrowed
+            
+            if (sortedBooks.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-base-content/60">No borrowing data yet</td></tr>';
+                return;
+            }
+            
+            table.innerHTML = sortedBooks.map(item => {
+                const bookName = item.bookName;
+                const borrowCount = item.borrowCount;
+                // Find book details from books array to get author and availability
+                const book = books.find(b => b.title === bookName);
+                const availableText = book && book.available === 'Yes' ? 'Yes' : 'No';
+                const availableClass = book && book.available === 'Yes' ? 'text-green-600' : 'text-red-600';
+                
+                return `
+                    <tr>
+                        <td class="font-semibold">${bookName}</td>
+                        <td>${book ? book.author : 'Unknown Author'}</td>
+                        <td><span class="badge badge-primary">${borrowCount}</span></td>
+                        <td><span class="${availableClass}">${availableText}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Books Due Today Function
+        function updateBooksDueToday() {
+            const table = document.getElementById('dueTodayTable');
+            const today = new Date();
+            const todayStr = formatISTDate(today);
+            
+            // Find books due today
+            const booksDueToday = borrowed.filter(borrow => {
+                if (borrow.returnDate) return false; // Already returned
+                
+                const dueDate = borrow.dueDateTime ? 
+                    formatISTDate(new Date(borrow.dueDateTime)) :
+                    borrow.dueDate;
+                    
+                return dueDate === todayStr;
+            });
+            
+            if (booksDueToday.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-base-content/60">No books due today</td></tr>';
+                return;
+            }
+            
+            table.innerHTML = booksDueToday.map(borrow => {
+                // Use bookName and username directly from backend data
+                const bookTitle = borrow.bookName || 'Unknown Book';
+                const userName = borrow.username || 'Unknown User';
+                
+                const dueDateTime = borrow.dueDateTime ? new Date(borrow.dueDateTime) : 
+                                   new Date(`${borrow.dueDate}T${borrow.dueTime || '23:59'}:00`);
+                
+                const now = new Date();
+                const isOverdue = now > dueDateTime;
+                const statusClass = isOverdue ? 'badge-error' : 'badge-warning';
+                const statusText = isOverdue ? 'OVERDUE' : 'DUE TODAY';
+                
+                return `
+                    <tr class="${isOverdue ? 'bg-red-50' : 'bg-yellow-50'}">
+                        <td class="font-semibold">${bookTitle}</td>
+                        <td>${userName}</td>
+                        <td>${formatISTTime(dueDateTime)}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Books Management
+        async function loadBooks() {
+            try {
+                const response = await apiCall('/books');
+                books = response.data || [];
+                saveToStorage();
+            } catch (error) {
+                console.log('Using local books data');
+            }
+            renderBooks();
+        }
+
+        function renderBooks() {
+            // Update book counts
+            const totalBooks = books.length;
+            const availableBooks = books.filter(book => book.available === "Yes").length;
+            const borrowedBooks = totalBooks - availableBooks;
+            
+            document.getElementById('totalBooksCount').textContent = totalBooks;
+            document.getElementById('availableBooksCount').textContent = availableBooks;
+            document.getElementById('borrowedBooksCount').textContent = borrowedBooks;
+            
+            const grid = document.getElementById('booksGrid');
+            if (books.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-base-300 rounded-full flex items-center justify-center">
+                            <div class="w-8 h-8 bg-primary rounded flex items-center justify-center text-white text-sm font-bold">K2</div>
+                        </div>
+                        <p class="text-base-content/60 mb-4">No books in the library yet</p>
+                        <button class="btn btn-primary" onclick="showAddBook()">Add Your First Book</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = books.map(book => `
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title">${book.title}</h2>
+                        <p><strong>Author:</strong> ${book.author}</p>
+                        <p><strong>ISBN:</strong> ${book.isbn}</p>
+                        <p><strong>Genre:</strong> ${book.genre}</p>
+                        <div class="badge ${book.available === 'Yes' ? 'badge-success' : 'badge-error'}">
+                            ${book.available === 'Yes' ? 'Available' : 'Borrowed'}
+                        </div>
+                        <div class="card-actions justify-end">
+                            <button class="btn btn-error btn-sm" onclick="deleteBook(${book.id})">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddBook() {
+            document.getElementById('addBookModal').showModal();
+        }
+
+        async function addBook() {
+            const title = document.getElementById('bookTitle').value.trim();
+            const author = document.getElementById('bookAuthor').value.trim();
+            const isbn = document.getElementById('bookISBN').value.trim();
+            const genre = document.getElementById('bookGenre').value.trim();
+            
+            if (!title || !author || !isbn || !genre) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (books.some(book => book.isbn === isbn)) {
+                showNotification('A book with this ISBN already exists', 'error');
+                return;
+            }
+            
+            const newBook = {
+                id: Date.now(),
+                title, author, isbn, genre,
+                available: true
+            };
+            
+            try {
+                const response = await apiCall('/books', 'POST', newBook);
+                // Only add to local storage if backend succeeds
+                books.push(response.data || newBook);
+                saveToStorage();
+                showNotification('✅ Book added to database!', 'success');
+                closeModal('addBookModal');
+                clearForm(['bookTitle', 'bookAuthor', 'bookISBN', 'bookGenre']);
+                loadBooks();
+                updateDashboard();
+            } catch (error) {
+                if (error.message === 'BACKEND_OFFLINE') {
+                    // Only add locally if backend is completely offline
+                    books.push(newBook);
+                    saveToStorage();
+                    showNotification('📱 Book added locally (backend offline)', 'warning');
+                    closeModal('addBookModal');
+                    clearForm(['bookTitle', 'bookAuthor', 'bookISBN', 'bookGenre']);
+                    loadBooks();
+                    updateDashboard();
+                } else {
+                    // Show actual error from backend
+                    showNotification(error.message, 'error');
+                }
+            }
+            updateDashboard();
+        }
+
+        async function deleteBook(bookId) {
+            // Find the book to get its title for checking borrowed status
+            const book = books.find(b => b.id === bookId);
+            const bookTitle = book ? book.title : null;
+            const isBookBorrowed = borrowed.some(b => b.bookName === bookTitle && !b.returnDate && !b.returnDateTime);
+            if (isBookBorrowed) {
+                showNotification('Cannot delete a book that is currently borrowed', 'error');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this book?')) {
+                try {
+                    await apiCall(`/books/${bookId}`, 'DELETE');
+                    // Only remove from local storage if API call succeeds
+                    books = books.filter(book => book.id !== bookId);
+                    saveToStorage();
+                    showNotification('Book deleted from database!', 'success');
+                } catch (error) {
+                    // If backend is available but returns an error, show the error
+                    if (error.message && !error.message.includes('fetch')) {
+                        showNotification(error.message, 'error');
+                    } else {
+                        // If backend is completely offline, delete locally
+                        books = books.filter(book => book.id !== bookId);
+                        saveToStorage();
+                        showNotification('Book deleted locally (backend unavailable)', 'warning');
+                    }
+                }
+                loadBooks();
+                updateDashboard();
+            }
+        }
+
+        // Users Management
+        async function loadUsers() {
+            try {
+                const response = await apiCall('/users');
+                users = response.data || [];
+                saveToStorage();
+            } catch (error) {
+                console.log('Using local users data');
+            }
+            renderUsers();
+        }
+
+        function renderUsers() {
+            const table = document.getElementById('usersTable');
+            if (users.length === 0) {
+                table.innerHTML = `
+                    <tr><td colspan="4" class="text-center text-base-content/60 py-8">
+                        <div class="flex flex-col items-center gap-4">
+                            <div class="w-12 h-12 bg-base-300 rounded-full flex items-center justify-center">
+                                <div class="w-6 h-6 bg-primary rounded flex items-center justify-center text-white text-xs font-bold">K2</div>
+                            </div>
+                            <div>
+                                <p class="mb-2">No users registered yet</p>
+                                <button class="btn btn-primary btn-sm" onclick="showAddUser()">Add Your First User</button>
+                            </div>
+                        </div>
+                    </td></tr>
+                `;
+                return;
+            }
+            
+            table.innerHTML = users.map(user => {
+                const activeBorrows = borrowed.filter(b => b.username === user.name && !b.returnDate && !b.returnDateTime).length;
+                return `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td><span class="badge ${activeBorrows > 0 ? 'badge-warning' : 'badge-ghost'}">${activeBorrows}</span></td>
+                        <td><button class="btn btn-error btn-sm" onclick="deleteUser(${user.id})">Delete</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showAddUser() {
+            document.getElementById('addUserModal').showModal();
+        }
+
+        async function addUser() {
+            const name = document.getElementById('userName').value.trim();
+            const username = document.getElementById('userUsername').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const phone = document.getElementById('userPhone').value.trim();
+            
+            if (!name || !username || !email || !phone) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            if (users.some(user => user.email === email)) {
+                showNotification('A user with this email already exists', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: Date.now(),
+                username, name, email, phone
+            };
+            
+            try {
+                const response = await apiCall('/users', 'POST', newUser);
+                // Only add to local storage if backend succeeds
+                users.push(response.data || newUser);
+                saveToStorage();
+                showNotification('User added to database!', 'success');
+                closeModal('addUserModal');
+                clearForm(['userName', 'userUsername', 'userEmail', 'userPhone']);
+                loadUsers();
+                updateDashboard();
+            } catch (error) {
+                if (error.message === 'BACKEND_OFFLINE') {
+                    // Only add locally if backend is completely offline
+                    users.push(newUser);
+                    saveToStorage();
+                    showNotification('User added locally (backend unavailable)', 'warning');
+                    closeModal('addUserModal');
+                    clearForm(['userName', 'userUsername', 'userEmail', 'userPhone']);
+                    loadUsers();
+                    updateDashboard();
+                } else {
+                    // Show actual error from backend
+                    showNotification(error.message, 'error');
+                }
+            }
+        }
+
+        async function deleteUser(userId) {
+            // Find the user to get their name for checking borrowed status  
+            const user = users.find(u => u.id === userId);
+            const userName = user ? user.name : null;
+            const activeUserBorrows = borrowed.filter(b => b.username === userName && !b.returnDate && !b.returnDateTime);
+            if (activeUserBorrows.length > 0) {
+                showNotification('Cannot delete a user with active borrows', 'error');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this user?')) {
+                try {
+                    await apiCall(`/users/${userId}`, 'DELETE');
+                    // Only remove from local storage if API call succeeds
+                    users = users.filter(user => user.id !== userId);
+                    saveToStorage();
+                    showNotification('User deleted from database!', 'success');
+                } catch (error) {
+                    // If backend is available but returns an error, show the error
+                    if (error.message && !error.message.includes('fetch')) {
+                        showNotification(error.message, 'error');
+                    } else {
+                        // If backend is completely offline, delete locally
+                        users = users.filter(user => user.id !== userId);
+                        saveToStorage();
+                        showNotification('User deleted locally (backend unavailable)', 'warning');
+                    }
+                }
+                loadUsers();
+                updateDashboard();
+            }
+        }
+
+        // Borrow Management
+        function loadBorrowOptions() {
+            const userSelect = document.getElementById('borrowUser');
+            const bookSelect = document.getElementById('borrowBook');
+            
+            userSelect.innerHTML = '<option disabled selected>Choose user</option>' + 
+                users.map(user => `<option value="${user.id}">${user.name}</option>`).join('');
+                
+            const availableBooks = books.filter(book => book.available === "Yes");
+            bookSelect.innerHTML = '<option disabled selected>Choose book</option>' + 
+                availableBooks.map(book => `<option value="${book.id}">${book.title} by ${book.author}</option>`).join('');
+                
+            loadBorrowedBooks();
+        }
+
+        async function borrowBook() {
+            const userId = document.getElementById('borrowUser').value;
+            const bookId = document.getElementById('borrowBook').value;
+            const borrowDate = document.getElementById('borrowDate').value;
+            const borrowTime = document.getElementById('borrowTime').value;
+            const dueDate = document.getElementById('dueDate').value;
+            const dueTime = document.getElementById('dueTime').value;
+            
+            if (!userId || !bookId || !borrowDate || !borrowTime || !dueDate || !dueTime) {
+                showNotification('Please fill in all fields including time', 'error');
+                return;
+            }
+            
+            const user = users.find(u => u.id == userId);
+            const book = books.find(b => b.id == bookId);
+            
+            if (!user || !book) {
+                showNotification('Invalid user or book selection', 'error');
+                return;
+            }
+            
+            // Create IST timestamp
+            const borrowDateTime = new Date(`${borrowDate}T${borrowTime}:00`);
+            const dueDateTime = new Date(`${dueDate}T${dueTime}:00`);
+            
+            const borrowData = {
+                id: Date.now(),
+                userId: parseInt(userId),
+                bookId: parseInt(bookId),
+                bookName: book.title,
+                username: user.name,
+                borrowDate: borrowDate,
+                borrowTime: borrowTime,
+                borrowDateTime: borrowDateTime.toISOString(),
+                dueDate: dueDate,
+                dueTime: dueTime,
+                dueDateTime: dueDateTime.toISOString(),
+                returnDate: null,
+                returnTime: null,
+                returnDateTime: null,
+                timezone: 'Asia/Kolkata'
+            };
+            
+            let backendSuccess = false;
+            try {
+                const response = await apiCall('/borrows', 'POST', borrowData);
+                if (response.success) {
+                    // Reload borrowed books from backend to get correct format
+                    const borrowsResponse = await apiCall('/borrows/active');
+                    borrowed = borrowsResponse.data || [];
+                    borrowData.id = response.data.id || borrowData.id;
+                    showNotification('✅ Book borrowed successfully in database!', 'success');
+                    backendSuccess = true;
+                }
+            } catch (error) {
+                if (error.message === 'BACKEND_OFFLINE') {
+                    showNotification('📱 Book borrowed locally (backend offline)', 'warning');
+                } else {
+                    showNotification('⚠️ Book borrowed locally (database error)', 'warning');
+                }
+            }
+            
+            // Only add to local storage if backend failed
+            if (!backendSuccess) {
+                borrowed.push(borrowData);
+            }
+            book.available = "No";
+            saveToStorage();
+            
+            loadBorrowOptions();
+            updateDashboard();
+            showNotification(`"${book.title}" borrowed to ${user.name} at ${formatISTDateTime(borrowDateTime)}`, 'success');
+        }
+
+        function loadBorrowedBooks() {
+            const table = document.getElementById('borrowedTable');
+            const activeBorrows = borrowed.filter(b => !b.returnDate && !b.returnDateTime);
+            
+            if (activeBorrows.length === 0) {
+                table.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-base-content/60">No books currently borrowed</td></tr>';
+                return;
+            }
+            
+            table.innerHTML = activeBorrows.map(borrow => {
+                // Use bookName and username directly from backend data
+                const bookTitle = borrow.bookName || 'Unknown Book';
+                const userName = borrow.username || 'Unknown User';
+                
+                // Handle both new and old format dates
+                const borrowDateTime = borrow.borrowDateTime ? new Date(borrow.borrowDateTime) : 
+                                     new Date(`${borrow.borrowDate}T${borrow.borrowTime || '00:00'}:00`);
+                const dueDateTime = borrow.dueDateTime ? new Date(borrow.dueDateTime) : 
+                                   new Date(`${borrow.dueDate}T${borrow.dueTime || '23:59'}:00`);
+                
+                const isOverdue = new Date() > dueDateTime;
+                const daysBorrowed = Math.floor((new Date() - borrowDateTime) / (1000 * 60 * 60 * 24));
+                
+                return `
+                    <tr class="${isOverdue ? 'bg-red-50' : ''}">
+                        <td>${bookTitle}</td>
+                        <td>${userName}</td>
+                        <td>
+                            <div>${formatISTDate(borrowDateTime)}</div>
+                            <div class="text-xs text-gray-600">${formatISTTime(borrowDateTime)}</div>
+                        </td>
+                        <td>
+                            <div class="${isOverdue ? 'text-red-600 font-bold' : ''}">${formatISTDate(dueDateTime)}</div>
+                            <div class="text-xs ${isOverdue ? 'text-red-600' : 'text-gray-600'}">${formatISTTime(dueDateTime)}</div>
+                            ${isOverdue ? '<div class="text-xs text-red-600">OVERDUE</div>' : ''}
+                        </td>
+                        <td><button class="btn btn-sm btn-secondary" onclick="quickReturn(${borrow.id})">Return</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function quickReturn(borrowId) {
+            const borrow = borrowed.find(b => b.id === borrowId);
+            if (!borrow) return;
+            
+            // Use bookName and username directly from backend data
+            const bookTitle = borrow.bookName || 'Unknown Book';
+            const userName = borrow.username || 'Unknown User';
+            
+            if (confirm(`Return "${bookTitle}" borrowed by ${userName}?`)) {
+                const returnDateTime = getISTTime();
+                const returnDate = formatISTDate(returnDateTime);
+                const returnTime = formatISTTime(returnDateTime);
+                
+                let backendSuccess = false;
+                try {
+                    const response = await apiCall(`/borrows/${borrowId}/return`, 'PUT', { 
+                        returnDate, 
+                        returnTime,
+                        returnDateTime: returnDateTime.toISOString(),
+                        timezone: 'Asia/Kolkata'
+                    });
+                    if (response.success) {
+                        showNotification('✅ Book returned successfully in database!', 'success');
+                        backendSuccess = true;
+                    }
+                } catch (error) {
+                    if (error.message === 'BACKEND_OFFLINE') {
+                        showNotification('📱 Book returned locally (backend offline)', 'warning');
+                    } else {
+                        showNotification('⚠️ Book returned locally (database error)', 'warning');
+                    }
+                }
+                
+                borrow.returnDate = returnDate;
+                borrow.returnTime = returnTime;
+                borrow.returnDateTime = returnDateTime.toISOString();
+                book.available = true;
+                saveToStorage();
+                
+                loadBorrowOptions();
+                loadReturnOptions();
+                updateDashboard();
+                
+                showNotification(`"${book.title}" returned by ${user.name} at ${formatISTDateTime(returnDateTime)}`, 'success');
+            }
+        }
+
+        // Return Management
+        function loadReturnOptions() {
+            const returnSelect = document.getElementById('returnBookId');
+            const activeBorrows = borrowed.filter(b => !b.returnDate && !b.returnDateTime);
+            
+            returnSelect.innerHTML = '<option disabled selected>Choose borrowed book</option>' + 
+                activeBorrows.map(borrow => {
+                    // Use bookName and username directly from backend data
+                    const bookTitle = borrow.bookName || 'Unknown Book';
+                    const userName = borrow.username || 'Unknown User';
+                    return `<option value="${borrow.id}">${bookTitle} (${userName})</option>`;
+                }).join('');
+        }
+
+        async function returnBook() {
+            const borrowedId = document.getElementById('returnBookId').value;
+            const returnDate = document.getElementById('returnDate').value;
+            const returnTime = document.getElementById('returnTime').value;
+            
+            if (!borrowedId || !returnDate || !returnTime) {
+                showNotification('Please select a book, return date and time', 'error');
+                return;
+            }
+            
+            const borrow = borrowed.find(b => b.id == borrowedId);
+            if (!borrow) {
+                showNotification('Borrowed book not found', 'error');
+                return;
+            }
+            
+            // Use bookName and username directly from backend data
+            const bookTitle = borrow.bookName || 'Unknown Book';
+            const userName = borrow.username || 'Unknown User';
+            
+            // Create IST timestamp
+            const returnDateTime = new Date(`${returnDate}T${returnTime}:00`);
+            
+            // Validate return time is not before borrow time
+            const borrowDateTime = new Date(borrow.borrowDateTime || `${borrow.borrowDate}T${borrow.borrowTime || '00:00'}:00`);
+            if (returnDateTime < borrowDateTime) {
+                showNotification('Return time cannot be before borrow time', 'error');
+                return;
+            }
+            
+            let backendSuccess = false;
+            try {
+                const response = await apiCall(`/borrows/${borrowedId}/return`, 'PUT', { 
+                    returnDate, 
+                    returnTime,
+                    returnDateTime: returnDateTime.toISOString(),
+                    timezone: 'Asia/Kolkata'
+                });
+                if (response.success) {
+                    showNotification('✅ Book returned successfully in database!', 'success');
+                    backendSuccess = true;
+                }
+            } catch (error) {
+                if (error.message === 'BACKEND_OFFLINE') {
+                    showNotification('📱 Book returned locally (backend offline)', 'warning');
+                } else {
+                    showNotification('⚠️ Book returned locally (database error)', 'warning');
+                }
+            }
+            
+            borrow.returnDate = returnDate;
+            borrow.returnTime = returnTime;
+            borrow.returnDateTime = returnDateTime.toISOString();
+            
+            // Update book availability in local storage
+            const book = books.find(b => b.title === bookTitle);
+            if (book) book.available = "Yes";
+            saveToStorage();
+            
+            loadReturnOptions();
+            loadBorrowOptions();
+            updateDashboard();
+            
+            // Calculate duration
+            const borrowTime = new Date(borrow.borrowDateTime || `${borrow.borrowDate}T${borrow.borrowTime || '00:00'}:00`);
+            const duration = Math.floor((returnDateTime - borrowTime) / (1000 * 60 * 60 * 24));
+            
+            showNotification(`"${bookTitle}" returned by ${userName} at ${formatISTDateTime(returnDateTime)} (${duration} days borrowed)`, 'success');
+        }
+
+        // Utility Functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).close();
+        }
+
+        function clearForm(fieldIds) {
+            fieldIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.value = '';
+            });
+        }
+    </script>
+</body>
+</html>
