@@ -4,7 +4,9 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "java -Dserver.port=$PORT -jar target/kindle-library-1.0.0.jar",
-    "healthcheckPath": "/api/dashboard/health"
+    "startCommand": "java -Dserver.port=$PORT -Dspring.profiles.active=production -jar target/kindle-library-1.0.0.jar",
+    "healthcheckPath": "/api/dashboard/health",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
   }
 }
